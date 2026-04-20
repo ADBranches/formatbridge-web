@@ -1,6 +1,6 @@
 import { apiRequest } from "./apiClient";
 
-export async function createConversionJob(filePublicIds, outputFormat) {
+export async function createConversionJob(filePublicIds, outputFormat, ocrEnabled = false) {
   return apiRequest("/conversions", {
     method: "POST",
     headers: {
@@ -9,6 +9,7 @@ export async function createConversionJob(filePublicIds, outputFormat) {
     body: JSON.stringify({
       file_public_ids: filePublicIds,
       output_format: outputFormat,
+      ocr_enabled: ocrEnabled,
     }),
   });
 }

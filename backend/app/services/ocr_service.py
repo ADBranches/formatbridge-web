@@ -5,7 +5,11 @@ import time
 import uuid
 from pathlib import Path
 
-import pytesseract
+try:
+    import pytesseract
+except ModuleNotFoundError:
+    pytesseract = None
+    
 from docx import Document
 from docx.shared import Pt
 from PIL import Image, ImageFilter, ImageOps, UnidentifiedImageError
@@ -59,6 +63,11 @@ def normalize_extracted_text(text: str) -> str:
 
 def extract_text_from_image(source_path: str | Path, languages: str | None = None) -> str:
     languages = languages or os.getenv("OCR_LANGUAGES", "eng")
+    
+    if pytesseract is None:
+        raise RuntimeError(
+            "pytesseract is not installed. Install pytesseract and ensure Tesseract OCR is available."
+    )
 
     try:
         processed_image = preprocess_image_for_ocr(source_path)

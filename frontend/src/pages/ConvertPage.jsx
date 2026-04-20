@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ConversionSummary from "../components/conversion/ConversionSummary";
 import FormatSelector from "../components/conversion/FormatSelector";
+import OcrOptionToggle from "../components/conversion/OcrOptionToggle";
 import JobStatusCard from "../components/jobs/JobStatusCard";
 import UploadDropzone from "../components/upload/UploadDropzone";
 import FileCard from "../components/upload/FileCard";
@@ -22,13 +23,22 @@ export default function ConvertPage() {
   const [outputFormat, setOutputFormat] = useState("pdf");
   const [isUploading, setIsUploading] = useState(false);
   const [isCreatingJob, setIsCreatingJob] = useState(false);
+  const [ocrEnabled, setOcrEnabled] = useState(false);
 
-  const { jobPayload, pollingError, isPolling } = useJobPolling(Boolean(jobId) ? jobId : null);
+  const { jobPayload, pollingError, isPolling } = useJobPolling(
+    Boolean(jobId) ? jobId : null
+  );
 
   const totalSize = useMemo(
     () => selectedFiles.reduce((sum, file) => sum + file.size, 0),
     [selectedFiles]
   );
+
+  useEffect(() => {
+    if (outputFormat !== "docx" && ocrEnabled) {
+      setOcrEnabled(false);
+    }
+  }, [outputFormat, ocrEnabled]);
 
   const handleFilesAdded = (incomingFiles) => {
     const mergedFiles = [...selectedFiles, ...incomingFiles].slice(0, MAX_FILES);
@@ -92,7 +102,8 @@ export default function ConvertPage() {
       setIsCreatingJob(true);
       const response = await createConversionJob(
         uploadedFiles.map((file) => file.public_id),
-        outputFormat
+        outputFormat,
+        ocrEnabled
       );
 
       const createdJobId = response?.data?.job?.public_id;
@@ -111,6 +122,7 @@ export default function ConvertPage() {
     setUploadResult(null);
     setJobCreationError("");
     setJobId("");
+    setOcrEnabled(false);
   };
 
   return (
@@ -220,12 +232,22 @@ export default function ConvertPage() {
                   </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                    <FormatSelector
-                      value={outputFormat}
-                      onChange={setOutputFormat}
-                      options={OUTPUT_OPTIONS}
-                      disabled={isCreatingJob}
-                    />
+                    <div className="flex flex-col gap-3">
+                      <FormatSelector
+                        value={outputFormat}
+                        onChange={setOutputFormat}
+                        options={OUTPUT_OPTIONS}
+                        disabled={isCreatingJob}
+                      />
+
+                      {outputFormat === "docx" && (
+                        <OcrOptionToggle
+                          checked={ocrEnabled}
+                          onChange={setOcrEnabled}
+                          disabled={isCreatingJob}
+                        />
+                      )}
+                    </div>
 
                     <button
                       type="button"
@@ -264,14 +286,13 @@ export default function ConvertPage() {
               </h2>
 
               <ul className="mt-4 space-y-3 text-sm text-slate-600">
-                <li>Single image -> one PDF</li>
-                <li>Multiple images -> one merged PDF</li>
+                <li>Single image -&gt; one PDF</li>
+                <li>Multiple images -&gt; one merged PDF</li>
                 <li>Image order is preserved in the merged PDF</li>
                 <li>Worker writes a downloadable PDF result row</li>
               </ul>
             </div>
 
-            
             {jobId && (
               <div className="rounded-3xl border border-brand-200 bg-brand-50 p-4 text-sm text-brand-700">
                 <p>
@@ -289,6 +310,7 @@ export default function ConvertPage() {
                 </div>
               </div>
             )}
+
             <JobStatusCard
               job={jobPayload?.job}
               results={jobPayload?.results || []}

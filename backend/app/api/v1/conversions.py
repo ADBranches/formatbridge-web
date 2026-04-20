@@ -1,4 +1,6 @@
-from flask import Blueprint, jsonify, request
+import uuid
+
+from flask import Blueprint, request
 from werkzeug.exceptions import NotFound
 
 from app.extensions import db
@@ -9,6 +11,7 @@ from app.schemas.conversion_schema import (
     validate_conversion_request,
 )
 from app.tasks.conversion_tasks import process_conversion_job_task
+from app.utils.response import success_response
 
 conversions_bp = Blueprint("conversions", __name__, url_prefix="/conversions")
 
@@ -20,6 +23,7 @@ def create_conversion_job():
 
     source_public_ids = data["file_public_ids"]
     requested_output_format = data["output_format"]
+    ocr_enabled = data["ocr_enabled"]
 
     files = (
         FileAsset.query.filter(FileAsset.public_id.in_(source_public_ids))
@@ -33,10 +37,11 @@ def create_conversion_job():
         raise NotFound(f"Some uploaded files were not found: {', '.join(missing_ids)}")
 
     job = ConversionJob(
-        public_id=__import__("uuid").uuid4().hex,
+        public_id=uuid.uuid4().hex,
         requested_output_format=requested_output_format,
         source_count=len(source_public_ids),
         source_public_ids=source_public_ids,
+        ocr_enabled=ocr_enabled,
         status="queued",
     )
 
@@ -45,9 +50,13 @@ def create_conversion_job():
 
     process_conversion_job_task.delay(job.public_id)
 
-    return jsonify(
-        serialize_conversion_job_created(
-            message="Conversion job created successfully.",
-            job=job,
-        )
-    ), 202
+    payload = serialize_conversion_job_created(
+        message="Conversion job created successfully.",
+        job=job,
+    )
+
+    return success_response(
+        message=payload["message"],
+        data=payload["data"],
+        status_code=202,
+    )

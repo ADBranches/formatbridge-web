@@ -46,28 +46,36 @@ def create_sample_image(path: Path, image_format: str) -> Path:
         ("webp", "WEBP", "webp"),
     ],
 )
+
 def test_supported_image_conversions(monkeypatch, tmp_path, source_extension, source_format, target_format):
     monkeypatch.setenv("CONVERTED_DIR", str(tmp_path / "converted"))
+    monkeypatch.setenv("CONVERTED_FILES_DIR", str(tmp_path / "converted"))
 
     from app.services.image_conversion_service import convert_image_file
+    from app.utils.naming import build_output_path, normalize_target_format
 
     source_path = tmp_path / f"sample.{source_extension}"
     create_sample_image(source_path, source_format)
 
-    result = convert_image_file(
-        source_path=source_path,
-        output_format=target_format,
+    normalized_target = normalize_target_format(target_format)
+
+    output_path = build_output_path(
+        directory=tmp_path / "converted",
         original_filename=source_path.name,
+        target_format=normalized_target,
     )
 
-    output_path = Path(result["output_path"])
+    converted_path = convert_image_file(
+        source_path=source_path,
+        output_path=output_path,
+        target_format=normalized_target,
+    )
 
-    assert output_path.exists()
-    assert output_path.suffix.lower() == f".{target_format}"
-    assert result["output_format"] == target_format
-    assert result["size_bytes"] > 0
+    assert converted_path.exists()
+    assert converted_path.suffix.lower() == f".{normalized_target}"
+    assert converted_path.stat().st_size > 0
 
-    with Image.open(output_path) as converted_image:
+    with Image.open(converted_path) as converted_image:
         converted_image.load()
         assert converted_image.width == 64
         assert converted_image.height == 64
@@ -80,6 +88,7 @@ def build_test_app(monkeypatch, tmp_path):
     monkeypatch.setenv("UPLOAD_DIR", str(tmp_path / "uploads"))
     monkeypatch.setenv("CONVERTED_DIR", str(tmp_path / "converted"))
     monkeypatch.setenv("PDF_OUTPUT_DIR", str(tmp_path / "converted"))
+    monkeypatch.setenv("CONVERTED_FILES_DIR", str(tmp_path / "converted"))
     monkeypatch.setenv("DOCX_OUTPUT_DIR", str(tmp_path / "converted"))
     monkeypatch.setenv("ZIP_OUTPUT_DIR", str(tmp_path / "archives"))
     monkeypatch.setenv("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
