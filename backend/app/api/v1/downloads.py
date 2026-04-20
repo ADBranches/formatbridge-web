@@ -4,7 +4,9 @@ from flask import Blueprint, send_file
 from werkzeug.exceptions import NotFound
 
 from app.extensions import db
+from app.models.conversion_job import ConversionJob
 from app.models.conversion_result import ConversionResult
+from app.services.zip_service import create_zip_for_job
 
 downloads_bp = Blueprint("downloads", __name__, url_prefix="/downloads")
 
@@ -41,4 +43,25 @@ def download_result(result_id: int):
         as_attachment=True,
         download_name=result.output_filename or file_path.name,
         mimetype=mimetype,
+    )
+
+
+@downloads_bp.get("/jobs/<string:job_public_id>/zip")
+def download_job_zip(job_public_id: str):
+    job = ConversionJob.query.filter_by(public_id=job_public_id).first()
+
+    if not job:
+        raise NotFound("Conversion job was not found.")
+
+    zip_bundle = create_zip_for_job(job)
+    zip_path = Path(zip_bundle["output_path"])
+
+    if not zip_path.exists():
+        raise NotFound("Generated ZIP archive is missing on disk.")
+
+    return send_file(
+        zip_path,
+        as_attachment=True,
+        download_name=zip_bundle["output_filename"],
+        mimetype="application/zip",
     )

@@ -1,5 +1,6 @@
 import { createBrowserRouter, Link } from "react-router-dom";
 import ConvertPage from "../pages/ConvertPage";
+import ResultsPage from "../pages/ResultsPage";
 
 function HomePage() {
   return (
@@ -7,7 +8,7 @@ function HomePage() {
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
           <span className="inline-flex rounded-full bg-brand-50 px-3 py-1 text-sm font-medium text-brand-700">
-            Phase 2 upload flow
+            Phase 7 ZIP packaging
           </span>
 
           <h1 className="mt-4 text-4xl font-bold tracking-tight text-slate-900">
@@ -15,7 +16,7 @@ function HomePage() {
           </h1>
 
           <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-600">
-            Secure upload, validation, and temporary persistence for supported image formats.
+            Batch results, ZIP packaging, and a dedicated results screen.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
@@ -23,7 +24,7 @@ function HomePage() {
               to="/convert"
               className="inline-flex rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
             >
-              Open upload page
+              Open convert page
             </Link>
 
             <a
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
   {
     path: "/convert",
     element: <ConvertPage />,
+  },
+  {
+    path: "/results/:jobId",
+    element: <ResultsPage />,
   },
   {
     path: "*",

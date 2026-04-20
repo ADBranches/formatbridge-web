@@ -271,13 +271,24 @@ export default function ConvertPage() {
               </ul>
             </div>
 
+            
             {jobId && (
               <div className="rounded-3xl border border-brand-200 bg-brand-50 p-4 text-sm text-brand-700">
-                Tracking job: <span className="font-semibold break-all">{jobId}</span>
-                {isPolling && <span className="ml-2">• polling...</span>}
+                <p>
+                  Tracking job: <span className="font-semibold break-all">{jobId}</span>
+                  {isPolling && <span className="ml-2">• polling...</span>}
+                </p>
+
+                <div className="mt-3">
+                  <a
+                    href={`/results/${jobId}`}
+                    className="inline-flex rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+                  >
+                    Open results page
+                  </a>
+                </div>
               </div>
             )}
-
             <JobStatusCard
               job={jobPayload?.job}
               results={jobPayload?.results || []}
