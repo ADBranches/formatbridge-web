@@ -1,38 +1,33 @@
 from __future__ import annotations
 
-import re
-import secrets
 from pathlib import Path
+from uuid import uuid4
+
+from werkzeug.utils import secure_filename
 
 
-TARGET_FORMAT_ALIASES = {
-    "jpeg": "jpg",
+FORMAT_ALIASES = {
     "jpg": "jpg",
+    "jpeg": "jpg",
     "png": "png",
     "webp": "webp",
 }
 
-TARGET_FORMATS = set(TARGET_FORMAT_ALIASES.values())
-
 
 def normalize_target_format(target_format: str) -> str:
-    normalized = target_format.strip().lower().lstrip(".")
-    normalized = TARGET_FORMAT_ALIASES.get(normalized, normalized)
+    normalized = (target_format or "").strip().lower().lstrip(".")
 
-    if normalized not in TARGET_FORMATS:
+    if normalized not in FORMAT_ALIASES:
         raise ValueError(
             f"Unsupported target format '{target_format}'. "
-            f"Expected one of: {sorted(TARGET_FORMATS)}"
+            f"Expected one of: {sorted(FORMAT_ALIASES)}"
         )
 
-    return normalized
+    return FORMAT_ALIASES[normalized]
 
 
-def sanitize_stem(filename: str) -> str:
-    raw_stem = Path(filename).stem.strip().lower()
-    raw_stem = re.sub(r"[^a-z0-9]+", "_", raw_stem)
-    raw_stem = re.sub(r"_+", "_", raw_stem).strip("_")
-    return raw_stem or "file"
+def get_output_extension(output_format: str) -> str:
+    return normalize_target_format(output_format)
 
 
 def ensure_directory(path: str | Path) -> Path:
@@ -41,27 +36,35 @@ def ensure_directory(path: str | Path) -> Path:
     return directory
 
 
-def build_converted_filename(
-    original_filename: str,
-    target_format: str,
-    token: str | None = None,
-) -> str:
-    normalized_format = normalize_target_format(target_format)
-    safe_stem = sanitize_stem(original_filename)
-    suffix = token or secrets.token_hex(4)
-    return f"{safe_stem}_{suffix}.{normalized_format}"
+def build_converted_filename(original_filename: str, output_format: str) -> str:
+    safe_name = secure_filename(original_filename) or "converted_file"
+    base_stem = Path(safe_name).stem.strip() or "converted_file"
+    normalized_stem = (
+        "".join(
+            char if char.isalnum() or char in {"-", "_"} else "_"
+            for char in base_stem
+        ).strip("_")
+        or "converted_file"
+    )
+    extension = get_output_extension(output_format)
+    unique_suffix = uuid4().hex[:10]
+
+    return f"{normalized_stem}_{unique_suffix}.{extension}"
 
 
 def build_output_path(
     directory: str | Path,
     original_filename: str,
     target_format: str,
-    token: str | None = None,
 ) -> Path:
-    ensured_directory = ensure_directory(directory)
-    filename = build_converted_filename(
-        original_filename=original_filename,
-        target_format=target_format,
-        token=token,
-    )
-    return ensured_directory / filename
+    normalized_target = normalize_target_format(target_format)
+    output_dir = ensure_directory(directory)
+
+    stem = Path(original_filename).stem.strip() or "converted_file"
+    safe_stem = "".join(
+        char if char.isalnum() or char in {"-", "_"} else "_"
+        for char in stem
+    ).strip("_") or "converted_file"
+
+    unique_suffix = uuid4().hex[:10]
+    return output_dir / f"{safe_stem}_{unique_suffix}.{normalized_target}"

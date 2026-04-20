@@ -52,8 +52,8 @@ def serialize_conversion_job_summary(job: ConversionJob) -> dict:
         "error_message": job.error_message,
         "created_at": job.created_at.isoformat(),
         "updated_at": job.updated_at.isoformat(),
-        "started_at": job.started_at.isoformat() if job.started_at else None,
-        "completed_at": job.completed_at.isoformat() if job.completed_at else None,
+        "started_at": getattr(job, "started_at", None).isoformat() if getattr(job, "started_at", None) else None,
+        "completed_at": getattr(job, "completed_at", None).isoformat() if getattr(job, "completed_at", None) else None,
     }
 
 

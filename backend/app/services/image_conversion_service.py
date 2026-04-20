@@ -7,9 +7,7 @@ from pillow_heif import register_heif_opener
 
 from app.utils.naming import ensure_directory, normalize_target_format
 
-
 register_heif_opener()
-
 
 SUPPORTED_INPUT_EXTENSIONS = {"heic", "heif", "jpg", "jpeg", "png", "webp"}
 SUPPORTED_TARGET_FORMATS = {"jpg", "png", "webp"}

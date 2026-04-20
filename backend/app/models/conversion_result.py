@@ -20,8 +20,9 @@ class ConversionResult(db.Model):
         index=True,
     )
     output_format = db.Column(db.String(20), nullable=False, index=True)
-    output_filename = db.Column(db.String(255), nullable=False)
-    output_path = db.Column(db.String(500), nullable=False, unique=True)
+    status = db.Column(db.String(20), nullable=False, default="processing")
+    output_filename = db.Column(db.String(255), nullable=True)
+    output_path = db.Column(db.String(500), nullable=True, unique=True)
     size_bytes = db.Column(db.Integer, nullable=False, default=0)
     is_zip_bundle = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

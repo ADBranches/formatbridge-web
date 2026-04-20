@@ -9,9 +9,15 @@ class ConversionJob(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     public_id = db.Column(db.String(64), nullable=False, unique=True, index=True)
     requested_output_format = db.Column(db.String(20), nullable=False, index=True)
+    source_public_ids = db.Column(db.JSON, nullable=False, default=list)
     source_count = db.Column(db.Integer, nullable=False, default=1)
+
     status = db.Column(db.String(30), nullable=False, default="queued", index=True)
     error_message = db.Column(db.Text, nullable=True)
+
+    started_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(
         db.DateTime,
@@ -19,7 +25,6 @@ class ConversionJob(db.Model):
         default=datetime.utcnow,
         onupdate=datetime.utcnow,
     )
-    completed_at = db.Column(db.DateTime, nullable=True)
 
     results = db.relationship(
         "ConversionResult",
