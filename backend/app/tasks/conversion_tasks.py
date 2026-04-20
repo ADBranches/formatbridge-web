@@ -15,7 +15,6 @@ def get_job_or_raise(job_public_id: str) -> ConversionJob:
         raise ValueError(f"Conversion job '{job_public_id}' was not found.")
     return job
 
-
 @celery.task(name="tasks.process_conversion_job")
 def process_conversion_job_task(job_public_id: str):
     job = get_job_or_raise(job_public_id)

@@ -1,4 +1,4 @@
-from celery import Celery
+from celery import Celery, Task
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -17,4 +17,12 @@ def init_celery(app):
         result_backend=app.config["CELERY_RESULT_BACKEND"],
         task_ignore_result=True,
     )
+
+    class FlaskTask(Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery.Task = FlaskTask
+    app.extensions["celery"] = celery
     return celery
