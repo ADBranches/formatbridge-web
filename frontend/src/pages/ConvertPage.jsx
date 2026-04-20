@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
+import ConversionSummary from "../components/conversion/ConversionSummary";
+import FormatSelector from "../components/conversion/FormatSelector";
+import JobStatusCard from "../components/jobs/JobStatusCard";
 import UploadDropzone from "../components/upload/UploadDropzone";
 import FileCard from "../components/upload/FileCard";
-import JobStatusCard from "../components/jobs/JobStatusCard";
 import useJobPolling from "../hooks/useJobPolling";
 import { formatFileSize, validateFilesClientSide } from "../utils/fileHelpers";
-import { uploadFiles } from "../services/uploadService";
 import { createConversionJob } from "../services/jobService";
+import { uploadFiles } from "../services/uploadService";
 
 const MAX_FILES = 10;
 const OUTPUT_OPTIONS = ["jpg", "png", "webp", "pdf", "docx"];
@@ -116,10 +118,10 @@ export default function ConvertPage() {
       <section className="mx-auto max-w-6xl px-6 py-12">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Upload and Queue Conversion
+            Upload and Convert Files
           </h1>
           <p className="mt-2 text-slate-600">
-            Phase 3 adds asynchronous conversion job creation and progress tracking.
+            Phase 5 adds PDF generation, merged PDF export, and downloadable results.
           </p>
         </div>
 
@@ -218,22 +220,12 @@ export default function ConvertPage() {
                   </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                    <div>
-                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600">
-                        Output format
-                      </label>
-                      <select
-                        value={outputFormat}
-                        onChange={(event) => setOutputFormat(event.target.value)}
-                        className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm text-slate-800"
-                      >
-                        {OUTPUT_OPTIONS.map((format) => (
-                          <option key={format} value={format}>
-                            {format.toUpperCase()}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <FormatSelector
+                      value={outputFormat}
+                      onChange={setOutputFormat}
+                      options={OUTPUT_OPTIONS}
+                      disabled={isCreatingJob}
+                    />
 
                     <button
                       type="button"
@@ -268,15 +260,14 @@ export default function ConvertPage() {
           <aside className="space-y-6">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-lg font-semibold text-slate-900">
-                Phase 3 rules
+                Phase 5 rules
               </h2>
 
               <ul className="mt-4 space-y-3 text-sm text-slate-600">
-                <li>Upload first</li>
-                <li>Create a conversion job after upload succeeds</li>
-                <li>Worker picks job from Redis broker queue</li>
-                <li>UI polls until the job becomes success or failed</li>
-                <li>Actual file conversion starts in Phase 4</li>
+                <li>Single image -> one PDF</li>
+                <li>Multiple images -> one merged PDF</li>
+                <li>Image order is preserved in the merged PDF</li>
+                <li>Worker writes a downloadable PDF result row</li>
               </ul>
             </div>
 
@@ -291,6 +282,11 @@ export default function ConvertPage() {
               job={jobPayload?.job}
               results={jobPayload?.results || []}
               pollingError={pollingError}
+            />
+
+            <ConversionSummary
+              job={jobPayload?.job}
+              results={jobPayload?.results || []}
             />
           </aside>
         </div>

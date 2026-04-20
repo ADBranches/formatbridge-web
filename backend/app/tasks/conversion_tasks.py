@@ -4,7 +4,7 @@ from datetime import datetime
 
 from celery.exceptions import Ignore
 
-from app.extensions import celery, db
+from app.extensions import celery_app, db
 from app.models.conversion_job import ConversionJob
 from app.services.conversion_router_service import run_phase3_conversion_job
 
@@ -15,7 +15,8 @@ def get_job_or_raise(job_public_id: str) -> ConversionJob:
         raise ValueError(f"Conversion job '{job_public_id}' was not found.")
     return job
 
-@celery.task(name="tasks.process_conversion_job")
+
+@celery_app.task(name="tasks.process_conversion_job")
 def process_conversion_job_task(job_public_id: str):
     job = get_job_or_raise(job_public_id)
 
@@ -25,7 +26,7 @@ def process_conversion_job_task(job_public_id: str):
         job.updated_at = datetime.utcnow()
         db.session.commit()
 
-        run_phase3_conversion_job(job_public_id)
+        summary = run_phase3_conversion_job(job_public_id)
 
         job = get_job_or_raise(job_public_id)
         job.status = "success"
@@ -36,6 +37,7 @@ def process_conversion_job_task(job_public_id: str):
         return {
             "job_public_id": job_public_id,
             "status": "success",
+            "summary": summary,
         }
 
     except Exception as exc:
