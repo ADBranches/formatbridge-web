@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from flask import current_app
+from app.utils.naming import build_output_path, normalize_target_format
+
 from pathlib import Path
 
 from werkzeug.exceptions import NotFound
@@ -8,6 +11,7 @@ from app.extensions import db
 from app.models.conversion_job import ConversionJob
 from app.models.conversion_result import ConversionResult
 from app.models.file_asset import FileAsset
+from app.services.docx_service import create_docx_from_images
 from app.services.image_conversion_service import convert_image_file
 from app.services.pdf_service import create_pdf_from_images
 
@@ -82,6 +86,26 @@ def process_pdf_job(job: ConversionJob, source_files: list[FileAsset]) -> int:
         raise
 
 
+def process_docx_job(job: ConversionJob, source_files: list[FileAsset]) -> int:
+    result = create_processing_result(job, source_file=None)
+
+    try:
+        converted = create_docx_from_images(source_files)
+
+        result = db.session.get(ConversionResult, result.id)
+        result.status = "success"
+        result.output_filename = converted["output_filename"]
+        result.output_path = converted["output_path"]
+        db.session.commit()
+
+        return 1
+
+    except Exception:
+        db.session.rollback()
+        mark_result_failed(result.id)
+        raise
+
+
 def process_image_job(job: ConversionJob, source_files: list[FileAsset]) -> int:
     converted_count = 0
 
@@ -94,16 +118,35 @@ def process_image_job(job: ConversionJob, source_files: list[FileAsset]) -> int:
         result = create_processing_result(job, source_file=source_file)
 
         try:
-            converted = convert_image_file(
-                source_path=source_file.storage_path,
-                output_format=job.requested_output_format,
+            normalized_target = normalize_target_format(job.requested_output_format)
+
+            conversions_dir = Path(
+                current_app.config.get(
+                    "CONVERTED_FILES_DIR",
+                    Path(current_app.instance_path) / "converted",
+                )
+            )
+
+            output_path = build_output_path(
+                directory=conversions_dir,
                 original_filename=source_file.original_filename,
+                target_format=normalized_target,
+            )
+
+            converted_path = convert_image_file(
+                source_path=source_file.storage_path,
+                output_path=output_path,
+                target_format=normalized_target,
             )
 
             result = db.session.get(ConversionResult, result.id)
+            if result is None:
+                raise ValueError("Conversion result record could not be reloaded.")
+
             result.status = "success"
-            result.output_filename = converted["output_filename"]
-            result.output_path = converted["output_path"]
+            result.output_filename = converted_path.name
+            result.output_path = str(converted_path)
+            result.size_bytes = converted_path.stat().st_size
             db.session.commit()
 
             converted_count += 1
@@ -119,7 +162,7 @@ def process_image_job(job: ConversionJob, source_files: list[FileAsset]) -> int:
 def run_phase3_conversion_job(job_public_id: str) -> dict:
     """
     Kept with the same function name for compatibility with the existing Celery task.
-    In Phase 5, this function routes image jobs and PDF jobs to the correct service.
+    In Phase 6, this function routes image, PDF, and DOCX jobs to the correct service.
     """
     job = get_job_or_raise(job_public_id)
     source_files = get_ordered_source_files(job)
@@ -132,6 +175,8 @@ def run_phase3_conversion_job(job_public_id: str) -> dict:
 
     if job.requested_output_format == "pdf":
         converted_count = process_pdf_job(job, source_files)
+    elif job.requested_output_format == "docx":
+        converted_count = process_docx_job(job, source_files)
     else:
         converted_count = process_image_job(job, source_files)
 

@@ -2,7 +2,6 @@ from flask import Flask, jsonify
 from werkzeug.exceptions import BadRequest, NotFound, RequestEntityTooLarge
 
 from app.api import api_bp
-from app.api.v1 import api_v1_bp
 from app.config import get_config
 from app.database import ping_database
 from app.extensions import cors, db, init_celery, migrate
@@ -21,8 +20,7 @@ def create_app(config_name: str | None = None):
     )
     init_celery(app)
 
-    api_bp.register_blueprint(api_v1_bp)
-    app.register_blueprint(api_bp)
+    app.register_blueprint(api_bp, url_prefix="/api")
 
     @app.get("/api/v1/health")
     def health_check():
