@@ -36,25 +36,43 @@ def create_app(config_name: str | None = None):
             error_message = str(exc)
 
         payload = {
-            "status": status,
-            "service": "formatbridge-api",
-            "database": database_status,
-            "queue": "configured",
+            "success": database_status == "connected",
+            "message": "Health check completed.",
             "error": error_message,
+            "data": {
+                "status": status,
+                "service": "formatbridge-api",
+                "database": database_status,
+                "queue": "configured",
+            },
         }
 
         return jsonify(payload), 200 if database_status == "connected" else 503
 
     @app.errorhandler(BadRequest)
     def handle_bad_request(error):
-        return jsonify({"message": str(error)}), 400
+        return jsonify({
+            "success": False,
+            "message": str(error),
+            "data": None,
+        }), 400
+
 
     @app.errorhandler(NotFound)
     def handle_not_found(error):
-        return jsonify({"message": str(error)}), 404
+        return jsonify({
+            "success": False,
+            "message": str(error),
+            "data": None,
+        }), 404
+
 
     @app.errorhandler(RequestEntityTooLarge)
     def handle_file_too_large(error):
-        return jsonify({"message": str(error)}), 413
+        return jsonify({
+            "success": False,
+            "message": str(error),
+            "data": None,
+        }), 413
 
     return app
