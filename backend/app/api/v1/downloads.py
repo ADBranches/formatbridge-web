@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from flask import Blueprint, send_file
+from flask import Blueprint, current_app, send_file
 from werkzeug.exceptions import NotFound
 
 from app.extensions import db
@@ -13,6 +13,16 @@ downloads_bp = Blueprint("downloads", __name__, url_prefix="/downloads")
 DOCX_MIMETYPE = (
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 )
+
+
+def resolve_output_path(stored_path: str) -> Path:
+    path = Path(stored_path)
+
+    if path.is_absolute():
+        return path
+
+    backend_root = Path(current_app.root_path).parent
+    return (backend_root / path).resolve()
 
 
 @downloads_bp.get("/results/<int:result_id>")
@@ -28,7 +38,8 @@ def download_result(result_id: int):
     if not result.output_path:
         raise NotFound("No output path is recorded for this conversion result.")
 
-    file_path = Path(result.output_path)
+    file_path = resolve_output_path(result.output_path)
+
     if not file_path.exists():
         raise NotFound("Generated output file is missing on disk.")
 
@@ -54,7 +65,7 @@ def download_job_zip(job_public_id: str):
         raise NotFound("Conversion job was not found.")
 
     zip_bundle = create_zip_for_job(job)
-    zip_path = Path(zip_bundle["output_path"])
+    zip_path = resolve_output_path(zip_bundle["output_path"])
 
     if not zip_path.exists():
         raise NotFound("Generated ZIP archive is missing on disk.")
