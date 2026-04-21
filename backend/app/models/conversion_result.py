@@ -26,6 +26,12 @@ class ConversionResult(db.Model):
     size_bytes = db.Column(db.Integer, nullable=False, default=0)
     is_zip_bundle = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
     def __repr__(self) -> str:
         return (

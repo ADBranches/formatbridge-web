@@ -8,8 +8,8 @@ export default function FormatSelector({
   disabled = false,
 }) {
   return (
-    <div>
-      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600">
+    <div className="space-y-2">
+      <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
         {label}
       </label>
 
@@ -17,7 +17,7 @@ export default function FormatSelector({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         disabled={disabled}
-        className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm text-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+        className="h-11 min-w-[170px] rounded-xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-800 shadow-sm outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {options.map((format) => (
           <option key={format} value={format}>

@@ -58,7 +58,7 @@ def save_uploaded_files(files: Iterable[FileStorage]) -> list[FileAsset]:
         original_filename = file_storage.filename or ""
 
         validate_file_extension(original_filename)
-        validate_file_mime_type(file_storage.mimetype or "")
+        validate_file_mime_type(file_storage.mimetype or "", original_filename)
 
         file_size = get_file_size(file_storage)
         validate_file_size(file_size, original_filename)

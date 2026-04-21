@@ -4,6 +4,10 @@ from app.schemas.conversion_schema import serialize_conversion_job_summary
 
 
 def serialize_conversion_result(result: ConversionResult) -> dict:
+    created_at = result.created_at.isoformat() if result.created_at else None
+    updated_at_value = getattr(result, "updated_at", None)
+    updated_at = updated_at_value.isoformat() if updated_at_value else created_at
+
     return {
         "id": result.id,
         "job_id": result.job_id,
@@ -12,8 +16,8 @@ def serialize_conversion_result(result: ConversionResult) -> dict:
         "status": result.status,
         "output_filename": result.output_filename,
         "output_path": result.output_path,
-        "created_at": result.created_at.isoformat(),
-        "updated_at": result.updated_at.isoformat(),
+        "created_at": created_at,
+        "updated_at": updated_at,
     }
 
 

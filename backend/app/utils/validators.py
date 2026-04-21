@@ -8,6 +8,12 @@ from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 from app.utils.file_types import ALLOWED_EXTENSIONS, ALLOWED_MIME_TYPES, get_extension
 
 
+EXTENSION_MIME_FALLBACKS = {
+    "heic": {"application/octet-stream"},
+    "heif": {"application/octet-stream"},
+}
+
+
 def ensure_files_present(files: list[FileStorage]) -> None:
     if not files:
         raise BadRequest("No files were provided. Use multipart/form-data with the 'files' field.")
@@ -30,12 +36,19 @@ def validate_file_extension(filename: str) -> None:
         )
 
 
-def validate_file_mime_type(mime_type: str) -> None:
-    if mime_type not in ALLOWED_MIME_TYPES:
-        allowed = ", ".join(sorted(ALLOWED_MIME_TYPES))
-        raise BadRequest(
-            f"Unsupported MIME type '{mime_type}'. Allowed: {allowed}."
-        )
+def validate_file_mime_type(mime_type: str, filename: str = "") -> None:
+    extension = get_extension(filename)
+
+    if mime_type in ALLOWED_MIME_TYPES:
+        return
+
+    if extension in EXTENSION_MIME_FALLBACKS and mime_type in EXTENSION_MIME_FALLBACKS[extension]:
+        return
+
+    allowed = ", ".join(sorted(ALLOWED_MIME_TYPES))
+    raise BadRequest(
+        f"Unsupported MIME type '{mime_type}'. Allowed: {allowed}."
+    )
 
 
 def validate_file_size(file_size: int, filename: str) -> None:
