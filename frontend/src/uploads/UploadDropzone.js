@@ -17,7 +17,7 @@ export default function UploadDropzone({
 }) {
   const handleDrop = useCallback(
     (acceptedFiles) => {
-      if (!acceptedFiles.length) return;
+      if (!acceptedFiles.length || typeof onFilesAdded !== "function") return;
       onFilesAdded(acceptedFiles);
     },
     [onFilesAdded]

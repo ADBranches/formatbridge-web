@@ -12,6 +12,7 @@ def create_app(config_name: str | None = None):
     app.config.from_object(get_config(config_name))
 
     db.init_app(app)
+    from app import models  # noqa: F401
     migrate.init_app(app, db)
     cors.init_app(
         app,

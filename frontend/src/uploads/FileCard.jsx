@@ -1,4 +1,4 @@
-import { formatFileSize, getFileExtension } from "../../utils/fileHelpers";
+import { formatFileSize, getFileExtension } from "../utils/fileHelpers";
 
 export default function FileCard({ file, onRemove }) {
   return (

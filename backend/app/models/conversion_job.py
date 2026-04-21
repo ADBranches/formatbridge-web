@@ -11,6 +11,8 @@ class ConversionJob(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     public_id = db.Column(db.String(64), nullable=False, unique=True, index=True)
 
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True, index=True)
+
     requested_output_format = db.Column(db.String(20), nullable=False, index=True)
     source_count = db.Column(db.Integer, nullable=False)
     source_public_ids = db.Column(db.JSON, nullable=False)
@@ -29,6 +31,8 @@ class ConversionJob(db.Model):
     )
     started_at = db.Column(db.DateTime, nullable=True)
     completed_at = db.Column(db.DateTime, nullable=True)
+
+    user = db.relationship("User", back_populates="conversion_jobs")
 
     results = db.relationship(
         "ConversionResult",

@@ -1,5 +1,7 @@
 import { createBrowserRouter, Link } from "react-router-dom";
+import ProtectedRoute from "../components/common/ProtectedRoute";
 import ConvertPage from "../pages/ConvertPage";
+import HistoryPage from "../pages/HistoryPage";
 import ResultsPage from "../pages/ResultsPage";
 
 function HomePage() {
@@ -8,7 +10,7 @@ function HomePage() {
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
           <span className="inline-flex rounded-full bg-brand-50 px-3 py-1 text-sm font-medium text-brand-700">
-            Phase 7 ZIP packaging
+            Phase 10 accounts and history
           </span>
 
           <h1 className="mt-4 text-4xl font-bold tracking-tight text-slate-900">
@@ -16,7 +18,7 @@ function HomePage() {
           </h1>
 
           <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-600">
-            Batch results, ZIP packaging, and a dedicated results screen.
+            User accounts, authenticated history, and future monetization readiness.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
@@ -27,14 +29,12 @@ function HomePage() {
               Open convert page
             </Link>
 
-            <a
-              href="http://127.0.0.1:5000/api/v1/health"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              to="/history"
               className="inline-flex rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
-              Check backend health
-            </a>
+              View history
+            </Link>
           </div>
         </div>
       </section>
@@ -71,6 +71,14 @@ const router = createBrowserRouter([
   {
     path: "/results/:jobId",
     element: <ResultsPage />,
+  },
+  {
+    path: "/history",
+    element: (
+      <ProtectedRoute>
+        <HistoryPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "*",

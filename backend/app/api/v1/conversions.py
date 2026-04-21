@@ -1,8 +1,10 @@
+import os
 import uuid
 
 from flask import Blueprint, request
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Unauthorized
 
+from app.api.v1.auth import get_current_user_from_request
 from app.extensions import db
 from app.models.conversion_job import ConversionJob
 from app.models.file_asset import FileAsset
@@ -25,6 +27,12 @@ def create_conversion_job():
     requested_output_format = data["output_format"]
     ocr_enabled = data["ocr_enabled"]
 
+    allow_anonymous = os.getenv("ALLOW_ANONYMOUS_CONVERSIONS", "true").lower() == "true"
+    current_user = get_current_user_from_request(required=False)
+
+    if not current_user and not allow_anonymous:
+        raise Unauthorized("Authentication is required to create conversion jobs.")
+
     files = (
         FileAsset.query.filter(FileAsset.public_id.in_(source_public_ids))
         .order_by(FileAsset.id.asc())
@@ -38,6 +46,7 @@ def create_conversion_job():
 
     job = ConversionJob(
         public_id=uuid.uuid4().hex,
+        user_id=current_user.id if current_user else None,
         requested_output_format=requested_output_format,
         source_count=len(source_public_ids),
         source_public_ids=source_public_ids,
