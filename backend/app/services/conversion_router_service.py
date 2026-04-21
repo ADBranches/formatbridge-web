@@ -44,11 +44,15 @@ def create_processing_result(
     job: ConversionJob,
     source_file: FileAsset | None = None,
 ) -> ConversionResult:
+    now = datetime.utcnow()
+
     result = ConversionResult(
         job_id=job.id,
         source_file_id=source_file.id if source_file else None,
         output_format=job.requested_output_format,
         status="processing",
+        created_at=now,
+        updated_at=now,
     )
     db.session.add(result)
     db.session.commit()
@@ -61,6 +65,7 @@ def mark_result_failed(result_id: int) -> None:
         return
 
     result.status = "failed"
+    result.updated_at = datetime.utcnow()
     db.session.commit()
 
 
@@ -74,6 +79,8 @@ def process_pdf_job(job: ConversionJob, source_files: list[FileAsset]) -> int:
         result.status = "success"
         result.output_filename = converted["output_filename"]
         result.output_path = converted["output_path"]
+        result.size_bytes = converted.get("size_bytes", result.size_bytes or 0)
+        result.updated_at = datetime.utcnow()
         db.session.commit()
 
         return 1
@@ -97,6 +104,8 @@ def process_docx_job(job: ConversionJob, source_files: list[FileAsset]) -> int:
         result.status = "success"
         result.output_filename = converted["output_filename"]
         result.output_path = converted["output_path"]
+        result.size_bytes = converted.get("size_bytes", result.size_bytes or 0)
+        result.updated_at = datetime.utcnow()
         db.session.commit()
 
         return 1
@@ -129,6 +138,8 @@ def process_image_job(job: ConversionJob, source_files: list[FileAsset]) -> int:
             result.status = "success"
             result.output_filename = converted["output_filename"]
             result.output_path = converted["output_path"]
+            result.size_bytes = converted.get("size_bytes", result.size_bytes or 0)
+            result.updated_at = datetime.utcnow()
             db.session.commit()
 
             converted_count += 1
