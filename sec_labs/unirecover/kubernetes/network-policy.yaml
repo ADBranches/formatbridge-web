@@ -1,0 +1,11 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-forensic-egress
+spec:
+  podSelector:
+    matchLabels:
+      app: unirecover-server
+  policyTypes:
+  - Egress
+  egress: [] # Block all external outbound traffic loops explicitly

@@ -1,0 +1,19 @@
+[workspace]
+members = [
+    "crates/unirecover-core",
+    "crates/unirecover-audit",
+    "crates/unirecover-acquisition",
+    "crates/unirecover-fs",
+    "crates/unirecover-carving",
+    "crates/unirecover-crypto",
+    "crates/unirecover-ffi",
+    "crates/unirecover-server",
+    "crates/unirecover-export"
+]
+resolver = "2"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"

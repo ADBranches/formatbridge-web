@@ -1,0 +1,9 @@
+name: UniRecover CI
+on: [push, pull_request]
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: cargo clippy --workspace -- -D warnings
+      - run: cargo test --workspace

@@ -1,0 +1,6 @@
+{
+  "device_model": "Pixel 7 Pro",
+  "lockout_schedule": [30, 30, 30, 30, 600, 1800],
+  "base_input_delay_ms": 125,
+  "wipe_threshold": 30
+}

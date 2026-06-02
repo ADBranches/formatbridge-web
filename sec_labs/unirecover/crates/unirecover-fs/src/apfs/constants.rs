@@ -1,0 +1,8 @@
+pub const APFS_NX_SIGNATURE: &[u8; 4] = b"NXSB";
+pub const APFS_APS_SIGNATURE: &[u8; 4] = b"APSB";
+
+pub const APFS_BLOCK_SIZE_DEFAULT: u64 = 4096;
+pub const APFS_NX_SUPERBLOCK_OFFSET: u64 = 32;
+
+pub const OBJECT_TYPE_NX_SUPERBLOCK: u32 = 0x00000001;
+pub const OBJECT_TYPE_OMAP: u32 = 0x0000000B;

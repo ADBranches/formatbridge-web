@@ -1,0 +1,2 @@
+class PixelCustomRecoveryPath:
+    pass

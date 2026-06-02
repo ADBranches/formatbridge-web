@@ -1,0 +1,10 @@
+[package]
+name = "unirecover-audit"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+unirecover-core = { path = "../unirecover-core" }
+hmac = "0.12"
+sha2 = "0.10"
+chrono = "0.4"

@@ -1,0 +1,14 @@
+/home/trovas/Downloads/projects/formatbridge-web/sec_labs/unirecover/target/debug/deps/serde-7f977e13178f236f.d: /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/trovas/Downloads/projects/formatbridge-web/sec_labs/unirecover/target/debug/build/serde-b1bc6066e7db9af4/out/private.rs
+
+/home/trovas/Downloads/projects/formatbridge-web/sec_labs/unirecover/target/debug/deps/libserde-7f977e13178f236f.rlib: /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/trovas/Downloads/projects/formatbridge-web/sec_labs/unirecover/target/debug/build/serde-b1bc6066e7db9af4/out/private.rs
+
+/home/trovas/Downloads/projects/formatbridge-web/sec_labs/unirecover/target/debug/deps/libserde-7f977e13178f236f.rmeta: /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/trovas/Downloads/projects/formatbridge-web/sec_labs/unirecover/target/debug/build/serde-b1bc6066e7db9af4/out/private.rs
+
+/home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/home/trovas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/home/trovas/Downloads/projects/formatbridge-web/sec_labs/unirecover/target/debug/build/serde-b1bc6066e7db9af4/out/private.rs:
+
+# env-dep:OUT_DIR=/home/trovas/Downloads/projects/formatbridge-web/sec_labs/unirecover/target/debug/build/serde-b1bc6066e7db9af4/out
