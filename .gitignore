@@ -94,3 +94,6 @@ pytestdebug.log
 # Misc
 # =========================
 *.zip
+
+# Rust build artifacts
+**/target/
